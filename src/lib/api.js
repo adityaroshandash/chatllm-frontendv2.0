@@ -1,4 +1,17 @@
+import { getIdToken } from "./firebase.js";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+async function authorizedFetch(url, options = {}) {
+  const token = await getIdToken();
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
 
 async function asJson(res) {
   if (!res.ok) {
@@ -15,7 +28,7 @@ async function asJson(res) {
 }
 
 export function initUser({ userId, username, email }) {
-  return fetch(`${API_URL}/users/init`, {
+  return authorizedFetch(`${API_URL}/users/init`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, username, email }),
@@ -23,11 +36,11 @@ export function initUser({ userId, username, email }) {
 }
 
 export function listSessions(userId) {
-  return fetch(`${API_URL}/users/${userId}/sessions`).then(asJson);
+  return authorizedFetch(`${API_URL}/users/${userId}/sessions`).then(asJson);
 }
 
 export function createSession(userId, title = "New chat") {
-  return fetch(`${API_URL}/users/${userId}/sessions`, {
+  return authorizedFetch(`${API_URL}/users/${userId}/sessions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title }),
@@ -35,7 +48,7 @@ export function createSession(userId, title = "New chat") {
 }
 
 export function getMessages(userId, sID) {
-  return fetch(`${API_URL}/users/${userId}/sessions/${sID}/messages`).then(asJson);
+  return authorizedFetch(`${API_URL}/users/${userId}/sessions/${sID}/messages`).then(asJson);
 }
 
 /**
@@ -44,7 +57,7 @@ export function getMessages(userId, sID) {
  * arrives.
  */
 export async function* chatStream(userId, sID, message) {
-  const res = await fetch(`${API_URL}/chat`, {
+  const res = await authorizedFetch(`${API_URL}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, sID, message }),

@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { getOrCreateUserId, getStoredProfile, storeProfile } from "./lib/user.js";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
+import remarkGfm from "remark-gfm";
+import { profileFromFirebaseUser } from "./lib/user.js";
+import { subscribeToAuth } from "./lib/firebase.js";
 import { initUser, listSessions, createSession, getMessages, chatStream } from "./lib/api.js";
 import Sidebar from "./components/Sidebar.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
+
 
 const GREETING = {
   sender: "bot",
@@ -17,8 +22,8 @@ function updateLast(list, fn) {
 }
 
 export default function App() {
-  const [userId] = useState(getOrCreateUserId);
-  const [profile, setProfile] = useState(getStoredProfile);
+  const [profile, setProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [ready, setReady] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [activeSID, setActiveSID] = useState(null);
@@ -27,6 +32,14 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const threadRef = useRef(null);
+  const userId = profile?.userId;
+
+  useEffect(() => {
+    return subscribeToAuth((user) => {
+      setProfile(profileFromFirebaseUser(user));
+      setAuthLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: "smooth" });
@@ -39,8 +52,8 @@ export default function App() {
 
     (async () => {
       try {
-        await initUser({ userId, username: profile.username, email: profile.email });
-        const existing = await listSessions(userId);
+        await initUser({ userId: profile.userId, username: profile.username, email: profile.email });
+        const existing = await listSessions(profile.userId);
         setSessions(existing);
         if (existing.length > 0) {
           await openSession(existing[0].sID);
@@ -128,10 +141,8 @@ export default function App() {
   if (!profile) {
     return (
       <OnboardingModal
-        onSubmit={(p) => {
-          storeProfile(p);
-          setProfile(p);
-        }}
+        loading={authLoading}
+        onSignedIn={(user) => setProfile(profileFromFirebaseUser(user))}
       />
     );
   }
@@ -170,8 +181,17 @@ export default function App() {
               </div>
 
               {m.searching && <div className="searching">checking the wire…</div>}
-
-              <p className="content">{m.text || (m.searching ? "" : "…")}</p>
+              <div className="content">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeSanitize]}
+                  components={{
+                    a: ({ node, ...props }) => <a {...props} target="_blank" rel="noreferrer" />,
+                  }}
+                >
+                  {m.text || (m.searching ? "" : "…")}
+                </ReactMarkdown>
+              </div>
 
               {m.sources?.length > 0 && (
                 <div className="sources">
