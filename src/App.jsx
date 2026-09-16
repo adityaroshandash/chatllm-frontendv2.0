@@ -25,6 +25,7 @@ export default function App() {
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [ready, setReady] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [activeSID, setActiveSID] = useState(null);
   const [messages, setMessages] = useState([GREETING]);
@@ -155,10 +156,22 @@ export default function App() {
         onSelect={openSession}
         onNewChat={() => startNewChat()}
         username={profile.username}
+        open={sidebarOpen}
       />
 
       <div className="app">
         <header className="header">
+          <button
+            className="sidebar-toggle"
+            type="button"
+            onClick={() => setSidebarOpen((open) => !open)}
+            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            aria-expanded={sidebarOpen}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
           <div className="brand">
             <span className="dot" aria-hidden="true" />
             <h1>Wire</h1>

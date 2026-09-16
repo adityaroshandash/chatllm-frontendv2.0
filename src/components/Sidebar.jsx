@@ -1,6 +1,6 @@
-export default function Sidebar({ sessions, activeSID, onSelect, onNewChat, username }) {
+export default function Sidebar({ sessions, activeSID, onSelect, onNewChat, username, open }) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${open ? "" : "hidden"}`}>
       <div className="sidebar-top">
         <span className="who-label">{username}</span>
         <button className="new-chat" onClick={onNewChat}>
