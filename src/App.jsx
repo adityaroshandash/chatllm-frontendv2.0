@@ -25,7 +25,7 @@ export default function App() {
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [ready, setReady] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [activeSID, setActiveSID] = useState(null);
   const [messages, setMessages] = useState([GREETING]);
@@ -157,26 +157,21 @@ export default function App() {
         onNewChat={() => startNewChat()}
         username={profile.username}
         open={sidebarOpen}
+        onToggle={() => setSidebarOpen((open) => !open)}
       />
 
       <div className="app">
         <header className="header">
-          <button
-            className="sidebar-toggle"
-            type="button"
-            onClick={() => setSidebarOpen((open) => !open)}
-            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-            aria-expanded={sidebarOpen}
-          >
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-          </button>
+          
           <div className="brand">
             <span className="dot" aria-hidden="true" />
             <h1>Wire</h1>
           </div>
-          <span className="tag">Model · qwen3:1.7b</span>
+          <span className="tag">
+            <span className="model-dot" aria-hidden="true" />
+            qwen3:1.7b
+            <span className="chevron" aria-hidden="true">⌄</span>
+          </span>
         </header>
 
         {error && <div className="banner">{error}</div>}
@@ -227,15 +222,22 @@ export default function App() {
             send();
           }}
         >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={ready ? "Ask about anything happening right now…" : "Setting up…"}
-            disabled={busy || !ready}
-          />
-          <button type="submit" disabled={busy || !ready || !input.trim()}>
-            Send
-          </button>
+          <div className="composer-field">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={ready ? "Ask Wire anything…" : "Setting up…"}
+              disabled={busy || !ready}
+            />
+            <button
+              type="submit"
+              className="send-button"
+              disabled={busy || !ready || !input.trim()}
+              aria-label="Send message"
+            >
+              <span aria-hidden="true">↑</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>
