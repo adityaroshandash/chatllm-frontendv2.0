@@ -11,7 +11,7 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 
 const GREETING = {
   sender: "bot",
-  text: "I'm xing. Ask about anything happening right now and I'll check the xing feeds before answering.",
+  text: "",
   sources: [],
 };
 
@@ -147,7 +147,7 @@ export default function App() {
       />
     );
   }
-
+  const isTyping = busy && i === messages.length - 1 && m.sender === "bot" && !m.text;
   return (
     <div className="shell">
       <Sidebar
@@ -162,7 +162,7 @@ export default function App() {
 
       <div className="app">
         <header className="header">
-          
+
           <div className="brand">
             <span className="dot" aria-hidden="true" />
             <h1>xing</h1>
@@ -190,15 +190,21 @@ export default function App() {
 
               {m.searching && <div className="searching">checking the xing…</div>}
               <div className="content">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeSanitize]}
-                  components={{
-                    a: ({ node, ...props }) => <a {...props} target="_blank" rel="noreferrer" />,
-                  }}
-                >
-                  {m.text || (m.searching ? "" : "…")}
-                </ReactMarkdown>
+                {isTyping ? (
+                  <div className="typing" role="status" aria-label="xing is typing">
+                    <span /><span /><span />
+                  </div>
+                ) : (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeSanitize]}
+                    components={{
+                      a: ({ node, ...props }) => <a {...props} target="_blank" rel="noreferrer" />,
+                    }}
+                  >
+                    {displayText || "…"}
+                  </ReactMarkdown>
+                )}
               </div>
 
               {m.sources?.length > 0 && (
