@@ -11,7 +11,7 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 
 const GREETING = {
   sender: "bot",
-  text: "I'm Wire. Ask about anything happening right now and I'll check the wire feeds before answering.",
+  text: "I'm xing. Ask about anything happening right now and I'll check the xing feeds before answering.",
   sources: [],
 };
 
@@ -165,7 +165,7 @@ export default function App() {
           
           <div className="brand">
             <span className="dot" aria-hidden="true" />
-            <h1>Wire</h1>
+            <h1>xing</h1>
           </div>
           <span className="tag">
             <span className="model-dot" aria-hidden="true" />
@@ -180,7 +180,7 @@ export default function App() {
           {messages.map((m, i) => (
             <div key={i} className={`msg ${m.sender === "user" ? "user" : "assistant"}`}>
               <div className="meta">
-                <span className="who">{m.sender === "user" ? profile.username : "Wire"}</span>
+                <span className="who">{m.sender === "user" ? profile.username : "xing"}</span>
                 {m.ts && (
                   <span className="time">
                     {new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -188,7 +188,7 @@ export default function App() {
                 )}
               </div>
 
-              {m.searching && <div className="searching">checking the wire…</div>}
+              {m.searching && <div className="searching">checking the xing…</div>}
               <div className="content">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -226,7 +226,7 @@ export default function App() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={ready ? "Ask Wire anything…" : "Setting up…"}
+              placeholder={ready ? "Ask xing anything…" : "Setting up…"}
               disabled={busy || !ready}
             />
             <button
